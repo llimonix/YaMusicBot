@@ -9,6 +9,9 @@ from discord.ext import commands
 from bot.ui import MediaPlayer
 from bot.utils.database import db
 from bot.utils.sheduler import BOT_SCHEDULER
+from bot.env import load_config
+
+config = load_config()
 
 
 class Bot(commands.AutoShardedBot):
@@ -44,8 +47,7 @@ bot: Bot = Bot()
 async def main() -> None:
     async with bot:
         await load_extensions()
-        await bot.start('MTA0NDcyMTI2NzgxMjYxMDI1MA.GwNI-a.lciZSrZcqt_TvT5E3U-uCmigE5lAVrZg0Wj6L4')
-        #await bot.start('MTE3MTI5NDQwMzA3MjExODg1NA.Gb1TVG.3EFGR8CuaGSYTv-aYSTFYSW_Bi4MPrMo3uUO-0')
+        await bot.start(config.TOKEN)
 
 
 async def load_extensions() -> None:

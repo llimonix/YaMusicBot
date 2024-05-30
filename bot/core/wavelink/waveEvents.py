@@ -11,6 +11,7 @@ from discord.ext import commands, tasks
 from bot.ui import MediaPlayer
 from bot.utils.tools import t_duration, delete_message_player, send_message_player, EmojiStr as ES
 from bot.utils.sheduler import BOT_SCHEDULER, no_members_voice_channel
+from bot.env import load_config
 
 
 class WaveEvents(commands.Cog):
@@ -18,12 +19,14 @@ class WaveEvents(commands.Cog):
 
     def __init__(self, bot: commands.AutoShardedBot):
         self.bot = bot
+        self.config = load_config()
         bot.loop.create_task(self.connect_nodes())
 
     async def connect_nodes(self):
         """Connect to our Lavalink nodes."""
         await self.bot.wait_until_ready()
-        nodes = [wavelink.Node(uri="http://localhost:4444", password="pass", inactive_player_timeout=300)]
+        nodes = [wavelink.Node(uri=f"{self.config.HOST_WAVELINK}:{self.config.PORT_WAVELINK}",
+                               password=self.config.PASS_WAVELINK, inactive_player_timeout=300)]
         if hasattr(self.bot, "node_connected") is False:
             await wavelink.Pool.connect(nodes=nodes, client=self.bot)
             self.bot.node_connected = True
@@ -31,8 +34,8 @@ class WaveEvents(commands.Cog):
     @commands.Cog.listener()
     async def on_wavelink_node_ready(self, payload: wavelink.NodeReadyEventPayload) -> None:
         logging.info(f"Wavelink запущен: {payload.node!r} | Возобновленных: {payload.resumed}")
-        BOT_SCHEDULER.add_job(no_members_voice_channel, id="no_members", trigger="interval", seconds=10,
-                              replace_existing=True)
+        # BOT_SCHEDULER.add_job(no_members_voice_channel, id="no_members", trigger="interval", seconds=10,
+        #                       replace_existing=True)
         await self.player_loop.start(node=payload.node)
 
     @tasks.loop(minutes=5)
