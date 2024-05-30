@@ -37,7 +37,7 @@ class Bot(commands.AutoShardedBot):
     async def on_ready(self) -> None:
         await db.create_table()
         bot.add_view(MediaPlayer())
-        BOT_SCHEDULER.start()
+        # BOT_SCHEDULER.start()
         logging.info(f"Logged in: {self.user} | {self.user.id}")
 
 
