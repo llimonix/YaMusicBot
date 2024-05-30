@@ -15,7 +15,7 @@ from bot.env import load_config
 
 
 class WaveEvents(commands.Cog):
-    """Music cog to hold Wavelink related commands and listeners."""
+    """Music cog to hold Wavelink related commands and listeners"""
 
     def __init__(self, bot: commands.AutoShardedBot):
         self.bot = bot
