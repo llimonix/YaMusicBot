@@ -286,11 +286,12 @@ class PlayCommand(commands.Cog):
         result, dominant_color = await mscard.create_music_card()
         r, g, b = dominant_color
         playlist_msg = f"[{track.playlist.name}]({track.playlist.url})" if track.playlist else "Нет"
+        tracklist_len = 0 if len(player.queue) == 0 else len(player.queue) - 1
         embed: Embed = discord.Embed(
             description=
             f"{ES.e_music}` [{t_duration(track.length)}] `[`{track.title} - {track.author}`]({track.uri})\n\n"
             f"> {ES.e_share} **Плейлист:** {playlist_msg}\n"
-            f"> {ES.e_tracklist} **В очереди:** {len(player.queue) - 1} трек(ов)\n"
+            f"> {ES.e_tracklist} **В очереди:** {tracklist_len} трек(ов)\n"
             f"> {ES.e_eject} **Добавил:** <@{track.extras.requester_id}>",
             color=discord.Color.from_rgb(r=r, g=g, b=b)
         )
