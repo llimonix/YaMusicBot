@@ -10,7 +10,6 @@ from discord.ext import commands, tasks
 
 from bot.ui import MediaPlayer
 from bot.utils.tools import t_duration, delete_message_player, send_message_player, EmojiStr as ES
-from bot.utils.sheduler import BOT_SCHEDULER, no_members_voice_channel
 from bot.env import load_config
 
 
@@ -25,8 +24,13 @@ class WaveEvents(commands.Cog):
     async def connect_nodes(self):
         """Connect to our Lavalink nodes."""
         await self.bot.wait_until_ready()
-        nodes = [wavelink.Node(uri=f"{self.config.HOST_WAVELINK}:{self.config.PORT_WAVELINK}",
-                               password=self.config.PASS_WAVELINK, inactive_player_timeout=300)]
+        nodes = [
+            wavelink.Node(
+                uri=f"{self.config.HOST_WAVELINK}:{self.config.PORT_WAVELINK}",
+                password=self.config.PASS_WAVELINK,
+                inactive_player_timeout=300,
+            )
+        ]
         if hasattr(self.bot, "node_connected") is False:
             await wavelink.Pool.connect(nodes=nodes, client=self.bot)
             self.bot.node_connected = True
@@ -46,12 +50,7 @@ class WaveEvents(commands.Cog):
         except:
             msg_status = "/play | /help"
 
-        await self.bot.change_presence(
-            activity=discord.Activity(
-                type=discord.ActivityType.listening,
-                name=msg_status,
-            )
-        )
+        await self.bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=msg_status))
 
     @commands.Cog.listener()
     async def on_wavelink_track_end(self, payload: wavelink.TrackEndEventPayload) -> None:
@@ -91,8 +90,9 @@ class WaveEvents(commands.Cog):
 
     @commands.Cog.listener()
     async def on_wavelink_inactive_player(self, player: wavelink.Player) -> None:
-        await send_message_player(player, title="Бот отключен от голосового чата!",
-                                  description="Бот отключен из-за отсутствия активности!")
+        await send_message_player(
+            player, title="Бот отключен от голосового чата!", description="Бот отключен из-за отсутствия активности!"
+        )
         await delete_message_player(player)
         await player.disconnect()
 
@@ -100,19 +100,23 @@ class WaveEvents(commands.Cog):
     async def ui_player(player: wavelink.Player) -> tuple[MediaPlayer, list[Embed], discord.File]:
         media_player = MediaPlayer()
         track: wavelink.Playable = player.queue[0]
-        mscard = MusicCard(image_link=track.artwork, title=track.title, artists=track.author,
-                           duration=t_duration(track.length), added_by=track.extras.requester_name)
+        mscard = MusicCard(
+            image_link=track.artwork,
+            title=track.title,
+            artists=track.author,
+            duration=t_duration(track.length),
+            added_by=track.extras.requester_name,
+        )
         result, dominant_color = await mscard.create_music_card()
         r, g, b = dominant_color
         playlist_msg = f"[{track.playlist.name}]({track.playlist.url})" if track.playlist else "Нет"
         tracklist_len = 0 if len(player.queue) == 0 else len(player.queue) - 1
         embed: Embed = discord.Embed(
-            description=
-            f"{ES.e_music}` [{t_duration(track.length)}] `[`{track.title} - {track.author}`]({track.uri})\n\n"
+            description=f"{ES.e_music}` [{t_duration(track.length)}] `[`{track.title} - {track.author}`]({track.uri})\n\n"
             f"> {ES.e_share} **Плейлист:** {playlist_msg}\n"
             f"> {ES.e_tracklist} **В очереди:** {tracklist_len} трек(ов)\n"
             f"> {ES.e_eject} **Добавил:** <@{track.extras.requester_id}>",
-            color=discord.Color.from_rgb(r=r, g=g, b=b)
+            color=discord.Color.from_rgb(r=r, g=g, b=b),
         )
         embed.set_author(name="Music Player", icon_url="https://i.imgur.com/noUMXgY.gif")
         embed.set_image(url=f"attachment://{result.filename}")

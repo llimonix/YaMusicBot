@@ -14,21 +14,16 @@ class PaginatorHandler:
 
     def get_embed(self, description):
         current_track = self.player.current
-        description = (f"**♬ | Сейчас играет:** [{current_track.title}]({current_track.uri}) "
-                       f"[<@{current_track.extras.requester_id}>]\n\n"
-                       f"**Очередь треков:**\n{description}")
+        description = (
+            f"**♬ | Сейчас играет:** [{current_track.title}]({current_track.uri}) "
+            f"[<@{current_track.extras.requester_id}>]\n\n"
+            f"**Очередь треков:**\n{description}"
+        )
 
-        embed = discord.Embed(
-            color=discord.Color.from_rgb(0, 148, 255),
-            description=description,
-        ).add_field(
-            name="Продолжительность",
-            value=self.all_length,
-            inline=True
-        ).add_field(
-            name="Всего треков",
-            value=f"`{self.player.queue.count}`",
-            inline=True
+        embed = (
+            discord.Embed(color=discord.Color.from_rgb(0, 148, 255), description=description)
+            .add_field(name="Продолжительность", value=self.all_length, inline=True)
+            .add_field(name="Всего треков", value=f"`{self.player.queue.count}`", inline=True)
         )
         return embed
 
@@ -37,21 +32,16 @@ class PaginatorHandler:
         msg = ""
         for i, track in enumerate(tracks, start=1):
             msg += f"**` {i} `** [{track['title']} - {track['author']}]({track['uri']}) [<@{track['requester_id']}>]\n"
-        description = (f"**♬ | Сейчас играет:** [{current_track.title}]({current_track.uri}) "
-                       f"[<@{current_track.extras.requester_id}>]\n\n"
-                       f"**{heading}:**\n{msg}")
+        description = (
+            f"**♬ | Сейчас играет:** [{current_track.title}]({current_track.uri}) "
+            f"[<@{current_track.extras.requester_id}>]\n\n"
+            f"**{heading}:**\n{msg}"
+        )
 
-        embed = discord.Embed(
-            color=discord.Color.from_rgb(0, 148, 255),
-            description=description,
-        ).add_field(
-            name="Продолжительность",
-            value=self.all_length,
-            inline=True
-        ).add_field(
-            name="Всего треков",
-            value=f"`{self.player.queue.count}`",
-            inline=True
+        embed = (
+            discord.Embed(color=discord.Color.from_rgb(0, 148, 255), description=description)
+            .add_field(name="Продолжительность", value=self.all_length, inline=True)
+            .add_field(name="Всего треков", value=f"`{self.player.queue.count}`", inline=True)
         )
         return embed
 
@@ -63,26 +53,27 @@ class PaginatorHandler:
 
         for i, (key, value) in enumerate(queue.items(), start=1):
             if value["type"] == "track":
-                main_queue_msg += (f"**` {i} `** [{key} - {value['author']}]({value['uri']}) "
-                                   f"[<@{value['requester_id']}>]\n")
+                main_queue_msg += (
+                    f"**` {i} `** [{key} - {value['author']}]({value['uri']}) " f"[<@{value['requester_id']}>]\n"
+                )
             elif value["type"] in ["album", "playlist", "artist"]:
-                type_search = {
-                    'artist': "Плейлист",
-                    'playlist': "Плейлист",
-                    'album': "Альбом",
-                }.get(value["type"], "Плейлист")
-                main_queue_msg += (f"**` {i} `** {type_search}: {key} ({len(value['tracks'])} треков) "
-                                   f"[<@{value['tracks'][0]['requester_id']}>]\n")
+                type_search = {"artist": "Плейлист", "playlist": "Плейлист", "album": "Альбом"}.get(
+                    value["type"], "Плейлист"
+                )
+                main_queue_msg += (
+                    f"**` {i} `** {type_search}: {key} ({len(value['tracks'])} треков) "
+                    f"[<@{value['tracks'][0]['requester_id']}>]\n"
+                )
                 track_pages = [
-                    self.get_track_embed(tracks=value["tracks"][j:j + 10],
-                                         heading=f"{type_search}: {key} ({len(value['tracks'])} треков)")
+                    self.get_track_embed(
+                        tracks=value["tracks"][j : j + 10],
+                        heading=f"{type_search}: {key} ({len(value['tracks'])} треков)",
+                    )
                     for j in range(0, len(value["tracks"]), 10)
                 ]
-                self.page_groups.append(pages.PageGroup(
-                    pages=track_pages,
-                    label=f"{type_search}: {key}",
-                    use_default_buttons=False
-                ))
+                self.page_groups.append(
+                    pages.PageGroup(pages=track_pages, label=f"{type_search}: {key}", use_default_buttons=False)
+                )
 
             if index == 10:
                 self.pages.append(self.get_embed(main_queue_msg))
@@ -97,31 +88,21 @@ class PaginatorHandler:
             self.pages.append(self.get_embed(main_queue_msg))
 
         # Добавление основного списка очереди как первой группы страниц
-        self.page_groups.insert(0, pages.PageGroup(
-            pages=self.pages,
-            label="Основной список очереди",
-            use_default_buttons=False
-        ))
+        self.page_groups.insert(
+            0, pages.PageGroup(pages=self.pages, label="Основной список очереди", use_default_buttons=False)
+        )
 
     async def respond(self, ctx: discord.ApplicationContext):
         page_buttons = [
+            pages.PaginatorButton("first", label="<<", style=discord.ButtonStyle.green),
             pages.PaginatorButton(
-                "first", label="<<", style=discord.ButtonStyle.green
+                "prev", label="<", style=discord.ButtonStyle.green, disabled=True if len(self.pages) == 1 else False
             ),
+            pages.PaginatorButton("page_indicator", style=discord.ButtonStyle.gray, disabled=True, label="|"),
             pages.PaginatorButton(
-                "prev", label="<", style=discord.ButtonStyle.green,
-                disabled=True if len(self.pages) == 1 else False
+                "next", label=">", style=discord.ButtonStyle.green, disabled=True if len(self.pages) == 1 else False
             ),
-            pages.PaginatorButton(
-                "page_indicator", style=discord.ButtonStyle.gray, disabled=True, label="|"
-            ),
-            pages.PaginatorButton(
-                "next", label=">", style=discord.ButtonStyle.green,
-                disabled=True if len(self.pages) == 1 else False
-            ),
-            pages.PaginatorButton(
-                "last", label=">>", style=discord.ButtonStyle.green
-            ),
+            pages.PaginatorButton("last", label=">>", style=discord.ButtonStyle.green),
         ]
 
         paginator = pages.Paginator(
@@ -131,7 +112,7 @@ class PaginatorHandler:
             custom_buttons=page_buttons,
             menu_placeholder="Список треков плейлиста или альбома",
             timeout=600,
-            disable_on_timeout=True
+            disable_on_timeout=True,
         )
 
         await paginator.respond(ctx, ephemeral=True)

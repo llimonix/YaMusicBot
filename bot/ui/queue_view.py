@@ -2,7 +2,7 @@ from typing import cast
 
 import wavelink
 
-from discord import ui, ButtonStyle, Embed, Colour, ApplicationContext
+from discord import ui, ButtonStyle, ApplicationContext
 from discord.ext.commands import AutoShardedBot
 
 

@@ -1,4 +1,3 @@
-from typing import cast
 
 import discord
 import wavelink
@@ -10,11 +9,9 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 BOT_TIMEZONE = "Europe/Moscow"
 
 jobstores = {
-    'default': RedisJobStore(jobs_key='dispatched_trips_jobs',
-                             run_times_key='dispatched_trips_running',
-                             host='localhost',
-                             port=6333,
-                             db=1)
+    "default": RedisJobStore(
+        jobs_key="dispatched_trips_jobs", run_times_key="dispatched_trips_running", host="localhost", port=6333, db=1
+    )
 }
 
 BOT_SCHEDULER = ContextSchedulerDecorator(AsyncIOScheduler(timezone=BOT_TIMEZONE, jobstores=jobstores))
@@ -25,7 +22,11 @@ async def no_members_voice_channel():
         if not no_player:
             return
 
-        channel = no_player.client.get_channel(no_player.interaction.channel.id) if hasattr(no_player, "interaction") else None
+        channel = (
+            no_player.client.get_channel(no_player.interaction.channel.id)
+            if hasattr(no_player, "interaction")
+            else None
+        )
         if not channel:
             return
 
@@ -39,9 +40,9 @@ async def no_members_voice_channel():
                 embed=discord.Embed(
                     title="Информация",
                     description="Бот отключен из-за отсутствия активности!",
-                    color=discord.Colour.orange()
+                    color=discord.Colour.orange(),
                 ),
-                delete_after=10
+                delete_after=10,
             )
             await message.delete()
 
@@ -55,8 +56,8 @@ async def no_members_voice_channel():
             if player is not None and player.channel is not None:
                 count = player.channel.members.__len__()
                 if count == 1:
-                    player.no_members = player.no_members + 10 if hasattr(player, 'no_members') else 10
+                    player.no_members = player.no_members + 10 if hasattr(player, "no_members") else 10
                     if player.no_members >= 300:
                         await disconnect_player(player)
                 else:
-                    player.no_members = 0 if hasattr(player, 'no_members') else 0
+                    player.no_members = 0 if hasattr(player, "no_members") else 0
