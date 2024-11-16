@@ -26,13 +26,14 @@ class MediaPlayer(ui.View):
         if ctx.user.voice is None or player.channel != ctx.user.voice.channel:
             await ctx.respond(
                 content=f"Для этого действия вам нужно находиться в голосовом канале: {player.channel.mention}!",
-                ephemeral=True, delete_after=10
+                ephemeral=True,
+                delete_after=10,
             )
             return
 
         media_player = MediaPlayer()
 
-        player.is_looping = player.is_looping if hasattr(player, 'is_looping') else False
+        player.is_looping = player.is_looping if hasattr(player, "is_looping") else False
 
         for child in media_player.children:
             if isinstance(child, ui.Button) and child.custom_id == "play_or_pause":
@@ -45,7 +46,8 @@ class MediaPlayer(ui.View):
         await ctx.edit(view=media_player)
         await ctx.channel.send(
             content=f"{ctx.user.mention} {'ставит' if player.paused else 'снимает'} паузу!",
-            delete_after=10, silent=True
+            delete_after=10,
+            silent=True,
         )
 
     @ui.button(style=ButtonStyle.red, custom_id="stop", row=0, emoji=ES.e_stop)
@@ -59,7 +61,8 @@ class MediaPlayer(ui.View):
         if ctx.user.voice is None or player.channel != ctx.user.voice.channel:
             await ctx.respond(
                 content=f"Для этого действия вам нужно находиться в голосовом канале: {player.channel.mention}!",
-                ephemeral=True, delete_after=10
+                ephemeral=True,
+                delete_after=10,
             )
             return
 
@@ -67,10 +70,7 @@ class MediaPlayer(ui.View):
         player.is_looping = False
 
         await player.stop(force=True)
-        await ctx.channel.send(
-            content=f"{ctx.user.mention} остановил музыку!",
-            delete_after=10, silent=True
-        )
+        await ctx.channel.send(content=f"{ctx.user.mention} остановил музыку!", delete_after=10, silent=True)
 
     @ui.button(style=ButtonStyle.grey, custom_id="shuffle_tracks", row=1, emoji=ES.e_shuffle)
     @check_role
@@ -83,7 +83,8 @@ class MediaPlayer(ui.View):
         if ctx.user.voice is None or player.channel != ctx.user.voice.channel:
             await ctx.respond(
                 content=f"Для этого действия вам нужно находиться в голосовом канале: {player.channel.mention}!",
-                ephemeral=True, delete_after=10
+                ephemeral=True,
+                delete_after=10,
             )
             return
 
@@ -110,10 +111,7 @@ class MediaPlayer(ui.View):
         player.queue.put(shuffled_queue)
 
         await ctx.edit(view=self)
-        await ctx.channel.send(
-            content=f"{ctx.user.mention} перемешал все треки!",
-            delete_after=10, silent=True
-        )
+        await ctx.channel.send(content=f"{ctx.user.mention} перемешал все треки!", delete_after=10, silent=True)
 
     @ui.button(style=ButtonStyle.grey, custom_id="similars_tracks", row=1, emoji=ES.e_similar)
     @check_role
@@ -126,7 +124,8 @@ class MediaPlayer(ui.View):
         if ctx.user.voice is None or player.channel != ctx.user.voice.channel:
             await ctx.respond(
                 content=f"Для этого действия вам нужно находиться в голосовом канале: {player.channel.mention}!",
-                ephemeral=True, delete_after=10
+                ephemeral=True,
+                delete_after=10,
             )
             return
 
@@ -139,8 +138,10 @@ class MediaPlayer(ui.View):
                 embed=Embed(
                     title="Похожие треки",
                     description="Не удалось найти ни одного трека похожего на этот.",
-                    color=Colour.red()
-                ), ephemeral=True, delete_after=10
+                    color=Colour.red(),
+                ),
+                ephemeral=True,
+                delete_after=10,
             )
             return
 
@@ -149,29 +150,37 @@ class MediaPlayer(ui.View):
                 embed=Embed(
                     title="Похожие треки",
                     description="Не удалось найти ни одного трека похожего на этот.",
-                    color=Colour.red()
-                ), ephemeral=True, delete_after=10
+                    color=Colour.red(),
+                ),
+                ephemeral=True,
+                delete_after=10,
             )
             return
 
         playlist_uid = gen_id()
 
         if isinstance(tracks, wavelink.Playlist):
-            tracks.extras = {"requester_id": ctx.user.id, "requester_name": ctx.user.display_name,
-                             "playlist_uid": playlist_uid}
+            tracks.extras = {
+                "requester_id": ctx.user.id,
+                "requester_name": ctx.user.display_name,
+                "playlist_uid": playlist_uid,
+            }
             await player.queue.put_wait(tracks)
         else:
             track = tracks[0]
-            track.extras = {"requester_id": ctx.user.id, "requester_name": ctx.user.display_name,
-                            "playlist_uid": playlist_uid}
+            track.extras = {
+                "requester_id": ctx.user.id,
+                "requester_name": ctx.user.display_name,
+                "playlist_uid": playlist_uid,
+            }
             await player.queue.put_wait(track)
 
         await ctx.respond(
             embed=Embed(
-                title="Похожие треки",
-                description="Похожие треки были добавлены в очередь!",
-                color=Colour.green()
-            ), ephemeral=True, delete_after=10
+                title="Похожие треки", description="Похожие треки были добавлены в очередь!", color=Colour.green()
+            ),
+            ephemeral=True,
+            delete_after=10,
         )
 
     @ui.button(style=ButtonStyle.blurple, custom_id="skip_track", row=0, emoji=ES.e_skip)
@@ -185,7 +194,8 @@ class MediaPlayer(ui.View):
         if ctx.user.voice is None or player.channel != ctx.user.voice.channel:
             await ctx.respond(
                 content=f"Для этого действия вам нужно находиться в голосовом канале: {player.channel.mention}!",
-                ephemeral=True, delete_after=10
+                ephemeral=True,
+                delete_after=10,
             )
             return
 
@@ -195,8 +205,7 @@ class MediaPlayer(ui.View):
             await player.pause(False)
 
         await ctx.channel.send(
-            content=f"{ctx.user.mention} пропустил трек **{player.current.title}**!",
-            delete_after=10, silent=True
+            content=f"{ctx.user.mention} пропустил трек **{player.current.title}**!", delete_after=10, silent=True
         )
         await player.skip(force=True)
         await ctx.response.defer()
@@ -212,7 +221,8 @@ class MediaPlayer(ui.View):
         if ctx.user.voice is None or player.channel != ctx.user.voice.channel:
             await ctx.respond(
                 content=f"Для этого действия вам нужно находиться в голосовом канале: {player.channel.mention}!",
-                ephemeral=True, delete_after=10
+                ephemeral=True,
+                delete_after=10,
             )
             return
 
@@ -233,15 +243,11 @@ class MediaPlayer(ui.View):
         else:
             msg = f"плейлист **{player.current.playlist.name}**"
 
-        await ctx.channel.send(
-            delete_after=10,
-            content=f"{ctx.user.mention} пропустил {msg}!", silent=True
-        )
+        await ctx.channel.send(delete_after=10, content=f"{ctx.user.mention} пропустил {msg}!", silent=True)
         await player.skip(force=True)
         await ctx.response.defer()
 
-    @ui.button(style=ButtonStyle.grey, custom_id="repeat_track", row=0,
-               emoji=ES.e_replay)
+    @ui.button(style=ButtonStyle.grey, custom_id="repeat_track", row=0, emoji=ES.e_replay)
     @check_role
     async def repeat_track(self, button: ui.Button, ctx: ApplicationContext) -> None:
         player: wavelink.Player = cast(wavelink.Player, ctx.guild.voice_client)
@@ -252,12 +258,13 @@ class MediaPlayer(ui.View):
         if ctx.user.voice is None or player.channel != ctx.user.voice.channel:
             await ctx.respond(
                 content=f"Для этого действия вам нужно находиться в голосовом канале: {player.channel.mention}!",
-                ephemeral=True, delete_after=10
+                ephemeral=True,
+                delete_after=10,
             )
             return
 
         media_player = MediaPlayer()
-        player.is_looping = player.is_looping if hasattr(player, 'is_looping') else False
+        player.is_looping = player.is_looping if hasattr(player, "is_looping") else False
 
         for child in media_player.children:
             if isinstance(child, ui.Button) and child.custom_id == "repeat_track":
@@ -271,7 +278,8 @@ class MediaPlayer(ui.View):
         await ctx.edit(view=media_player)
         await ctx.channel.send(
             content=f"{ctx.user.mention} {'включает' if player.is_looping else 'выключает'} повтор трека!",
-            delete_after=10, silent=True
+            delete_after=10,
+            silent=True,
         )
 
     @ui.button(style=ButtonStyle.grey, custom_id="help", row=1, emoji=ES.e_help)
@@ -284,29 +292,26 @@ class MediaPlayer(ui.View):
         embed = Embed(
             title="Подсказка",
             description=f"{ES.e_music} Данный бот проигрывает Треки/Альбомы/Плейлисты/Подкасты/Книги "
-                        "из Яндекс.Музыки!\n\n"
-                        "Вы можете добавить трек отправив ссылку/название трека или отрывок из песни с помощью "
-                        "команды: </play:1171295728300212344>\n\n",
+            "из Яндекс.Музыки!\n\n"
+            "Вы можете добавить трек отправив ссылку/название трека или отрывок из песни с помощью "
+            "команды: </play:1171295728300212344>\n\n",
             colour=Colour.green(),
         )
 
         embed.add_field(
             name="Подсказки по кнопкам",
             value=f"{ES.e_pause} | {ES.e_play} - Паузка или продолжение проигрывания.\n"
-                  f"{ES.e_skip} - Пропустить один Трек | Подкаст | Книгу в очереди.\n"
-                  f"{ES.e_forward}- Пропустить целый плейлист в очереди.\n"
-                  f"{ES.e_replay} - Повторять Трек | Подкаст | Книгу в очереди.\n"
-                  f"{ES.e_shuffle} - Перемешать все треки во всех плейлистах.\n"
-                  f"{ES.e_stop} - Полностью остановить проигрывание и очистить очередь!\n"
-                  f"{ES.e_similar} - Добавить в очередь треки похожие на играющий.\n"
-                  f"{ES.e_tracklist} - Очередь треков.\n"
-                  f"{ES.e_volume} - Громкость проигрывания.\n"
+            f"{ES.e_skip} - Пропустить один Трек | Подкаст | Книгу в очереди.\n"
+            f"{ES.e_forward}- Пропустить целый плейлист в очереди.\n"
+            f"{ES.e_replay} - Повторять Трек | Подкаст | Книгу в очереди.\n"
+            f"{ES.e_shuffle} - Перемешать все треки во всех плейлистах.\n"
+            f"{ES.e_stop} - Полностью остановить проигрывание и очистить очередь!\n"
+            f"{ES.e_similar} - Добавить в очередь треки похожие на играющий.\n"
+            f"{ES.e_tracklist} - Очередь треков.\n"
+            f"{ES.e_volume} - Громкость проигрывания.\n",
         )
 
-        await ctx.respond(
-            embed=embed,
-            ephemeral=True
-        )
+        await ctx.respond(embed=embed, ephemeral=True)
 
     @ui.button(style=ButtonStyle.grey, custom_id="queue", row=1, emoji=ES.e_tracklist)
     async def queue(self, button: ui.Button, ctx: ApplicationContext) -> None:
@@ -318,7 +323,8 @@ class MediaPlayer(ui.View):
         if ctx.user.voice is None or player.channel != ctx.user.voice.channel:
             await ctx.respond(
                 content=f"Для этого действия вам нужно находиться в голосовом канале: {player.channel.mention}!",
-                ephemeral=True, delete_after=10
+                ephemeral=True,
+                delete_after=10,
             )
             return
 
@@ -337,7 +343,8 @@ class MediaPlayer(ui.View):
         if ctx.user.voice is None or player.channel != ctx.user.voice.channel:
             await ctx.respond(
                 content=f"Для этого действия вам нужно находиться в голосовом канале: {player.channel.mention}!",
-                ephemeral=True, delete_after=10
+                ephemeral=True,
+                delete_after=10,
             )
             return
 

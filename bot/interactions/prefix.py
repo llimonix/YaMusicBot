@@ -1,10 +1,7 @@
 import discord
 from discord.ext import commands
-import wavelink
 
-from typing import cast
 
-from bot.utils.database import db
 
 
 class PrefixCommand(commands.Cog):
@@ -15,25 +12,24 @@ class PrefixCommand(commands.Cog):
     async def refresh(self, ctx):
         if ctx.author.id == 348420809389506562 and isinstance(ctx.channel, discord.DMChannel):
             cogs_list = [
-                'interactions.play',
-                'interactions.info',
-                'interactions.help',
-                'interactions.prefix',
-                'interactions.role',
-                'core.events',
-                'core.wavelink.waveEvents',
+                "interactions.play",
+                "interactions.info",
+                "interactions.help",
+                "interactions.prefix",
+                "interactions.role",
+                "core.events",
+                "core.wavelink.waveEvents",
             ]
 
             self.bot._pending_application_commands = []
 
             for cog in cogs_list:
-                self.bot.reload_extension(f'bot.{cog}')
+                self.bot.reload_extension(f"bot.{cog}")
 
             synced = len(self.bot.all_commands) + len(self.bot.pending_application_commands)
 
             await self.bot.sync_commands(force=True)
-            await ctx.channel.send(f"**Структура бота обновлена**\n"
-                                   f"*Синхронизировано команд: {synced}*")
+            await ctx.channel.send(f"**Структура бота обновлена**\n" f"*Синхронизировано команд: {synced}*")
 
 
 def setup(bot):

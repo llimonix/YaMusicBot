@@ -12,3 +12,5 @@ dist/
 
 .idea/
 /servers.db
+
+.DS_Store

@@ -80,9 +80,9 @@ def check_voice(func):
             return await func(*args)
         else:
             await args[2].response.send_message(
-                "Для выполнения этого действия вы должны находится в голосовом канале!",
-                ephemeral=True
+                "Для выполнения этого действия вы должны находится в голосовом канале!", ephemeral=True
             )
+
     return wrapper
 
 
@@ -101,12 +101,9 @@ def check_role(func):
                 embed = Embed(
                     title="Ошибка",
                     description=f"У вас нет роли {target_role.mention} для выполнения этого действия!",
-                    color=Colour.red()
+                    color=Colour.red(),
                 )
-                await interaction.response.send_message(
-                    embed=embed,
-                    ephemeral=True
-                )
+                await interaction.response.send_message(embed=embed, ephemeral=True)
             else:
                 return await func(*args)
 
@@ -125,8 +122,9 @@ async def send_message_player(player: wavelink.Player, title: str, description: 
     if hasattr(player, "interaction"):
         try:
             await player.interaction.channel.send(
-                embed=discord.Embed(title=title, description=description,
-                                    color=discord.Colour.brand_red()), delete_after=10)
+                embed=discord.Embed(title=title, description=description, color=discord.Colour.brand_red()),
+                delete_after=10,
+            )
         except (discord.HTTPException, discord.Forbidden, discord.InvalidArgument):
             pass
 
@@ -142,12 +140,7 @@ def sorted_queue(player):
         nonlocal all_length
         all_length += sum(track.length for track in tracks)
         return [
-            {
-                "title": track.title,
-                "author": track.author,
-                "uri": track.uri,
-                "requester_id": track.extras.requester_id,
-            }
+            {"title": track.title, "author": track.author, "uri": track.uri, "requester_id": track.extras.requester_id}
             for track in tracks
         ]
 
@@ -167,19 +160,17 @@ def sorted_queue(player):
     for item in media_item_queue:
         if item["playlist"]:
             playlist_name = item["playlist"].name
-            type_search = item["playlist"].type if item["playlist"].type in ["album", "playlist", "artist"] \
-                else "playlist"
-            queue_dict[playlist_name] = {
-                "type": type_search,
-                "tracks": item["tracks"],
-            }
+            type_search = (
+                item["playlist"].type if item["playlist"].type in ["album", "playlist", "artist"] else "playlist"
+            )
+            queue_dict[playlist_name] = {"type": type_search, "tracks": item["tracks"]}
         else:
             for track in item["tracks"]:
                 queue_dict[track["title"]] = {
                     "type": "track",
                     "author": track["author"],
                     "uri": track["uri"],
-                    "requester_id": track["requester_id"]
+                    "requester_id": track["requester_id"],
                 }
 
     return queue_dict, all_length

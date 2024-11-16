@@ -29,9 +29,9 @@ class MusicCard:
     def _IMGtoFILE(IMG: Image) -> Union[discord.File, BytesIO]:
         uniq_id = gen_id()
         with BytesIO() as image_binary:
-            IMG.save(image_binary, 'PNG')
+            IMG.save(image_binary, "PNG")
             image_binary.seek(0)
-            return discord.File(fp=image_binary, filename=f'{uniq_id}.png')
+            return discord.File(fp=image_binary, filename=f"{uniq_id}.png")
 
     @staticmethod
     def _process_image(image_data):
@@ -44,10 +44,10 @@ class MusicCard:
 
     @staticmethod
     def _create_diagonal_gradient(width, height, color1, color2):
-        base = Image.new('RGBA', (width, height), color1)
-        top = Image.new('RGBA', (width, height), color2)
+        base = Image.new("RGBA", (width, height), color1)
+        top = Image.new("RGBA", (width, height), color2)
 
-        mask = Image.new('L', (width, height))
+        mask = Image.new("L", (width, height))
         ImageDraw.Draw(mask)
 
         for i in range(width):
@@ -65,10 +65,10 @@ class MusicCard:
 
     @staticmethod
     def _add_rounded_corners(image, radius):
-        mask = Image.new('L', image.size, 0)
+        mask = Image.new("L", image.size, 0)
         draw = ImageDraw.Draw(mask)
         draw.rounded_rectangle((0, 0, mask.width, mask.height), radius, fill=255)
-        rounded_image = Image.new('RGBA', image.size, (0, 0, 0, 0))
+        rounded_image = Image.new("RGBA", image.size, (0, 0, 0, 0))
         rounded_image.paste(image, (0, 0), mask)
         return rounded_image
 
@@ -173,7 +173,7 @@ class MusicCard:
         card_width, card_height = 800, 300
         gradient = self._create_diagonal_gradient(card_width, card_height, color1, color2)
 
-        card = Image.new('RGBA', (card_width, card_height))
+        card = Image.new("RGBA", (card_width, card_height))
         card.paste(gradient, (0, 0))
 
         image_x = (card_width - main_image.width) // 10
@@ -194,7 +194,7 @@ class MusicCard:
         title_color = title_color + (220,)
         other_color = other_color + (220,)
 
-        text_layer = Image.new('RGBA', card.size, (255, 255, 255, 0))
+        text_layer = Image.new("RGBA", card.size, (255, 255, 255, 0))
         text_draw = ImageDraw.Draw(text_layer)
 
         text_x = image_x + main_image.width + 20
